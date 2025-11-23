@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <title>Agendar Consultas - Masculife</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .agendamento-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--branco-off), var(--azul-suave), var(--verde-claro));
+            padding: var(--espaco-xl) 0;
+        }
+
+        .agendamento-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--espaco-sm);
+        }
+
+        .agendamento-header {
+            text-align: center;
+            margin-bottom: var(--espaco-xl);
+        }
+
+        .agendamento-header h1 {
+            color: var(--azul-petroleo);
+            font-size: 2.5rem;
+            margin-bottom: var(--espaco-sm);
+            font-weight: 700;
+        }
+
+        .agendamento-header p {
+            color: var(--cinza-escuro);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--espaco-xs);
+            color: var(--azul-verde);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: var(--espaco-lg);
+            transition: var(--transicao-rapida);
+        }
+
+        .back-button:hover {
+            color: var(--verde-marrom);
+            transform: translateX(-5px);
+        }
+
+        .tabs-container {
+            background: var(--branco);
+            border-radius: var(--borda-radius-lg);
+            box-shadow: var(--sombra-forte);
+            overflow: hidden;
+            margin-bottom: var(--espaco-xl);
+        }
+
+        .tabs-header {
+            display: flex;
+            background: linear-gradient(135deg, var(--azul-petroleo), var(--verde-marrom));
+        }
+
+        .tab {
+            flex: 1;
+            padding: var(--espaco-md);
+            text-align: center;
+            color: var(--branco);
+            background: none;
+            border: none;
+            font-family: var(--fonte-principal);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transicao-rapida);
+            position: relative;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--azul-suave);
+        }
+
+        .tab-content {
+            padding: var(--espaco-xl);
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .form-agendamento {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--espaco-lg);
+            margin-bottom: var(--espaco-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: var(--cinza-escuro);
+            font-weight: 500;
+            margin-bottom: var(--espaco-xs);
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: var(--espaco-sm);
+            border: 2px solid var(--cinza-claro);
+            border-radius: var(--borda-radius);
+            font-size: 1rem;
+            transition: var(--transicao-rapida);
+            background-color: var(--branco-off);
+            font-family: var(--fonte-principal);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--azul-verde);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--espaco-sm);
+            margin-top: var(--espaco-md);
+        }
+
+        .time-slot {
+            padding: var(--espaco-sm);
+            border: 2px solid var(--cinza-claro);
+            border-radius: var(--borda-radius);
+            background: var(--branco-off);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transicao-rapida);
+            font-weight: 500;
+        }
+
+        .time-slot:hover {
+            border-color: var(--azul-verde);
+            background: var(--azul-suave);
+            color: var(--branco);
+        }
+
+        .time-slot.selected {
+            border-color: var(--azul-verde);
+            background: var(--azul-verde);
+            color: var(--branco);
+        }
+
+        .time-slot.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--cinza-claro);
+        }
+
+        .btn-agendar {
+            width: 100%;
+            padding: var(--espaco-md);
+            font-size: 1.1rem;
+            margin-top: var(--espaco-lg);
+        }
+
+        .consultas-lista {
+            display: flex;
+            flex-direction: column;
+            gap: var(--espaco-md);
+        }
+
+        .consulta-card {
+            background: var(--branco-off);
+            border-radius: var(--borda-radius);
+            padding: var(--espaco-lg);
+            border-left: 4px solid var(--azul-verde);
+            transition: var(--transicao-rapida);
+        }
+
+        .consulta-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-suave);
+        }
+
+        .consulta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--espaco-sm);
+        }
+
+        .consulta-info h3 {
+            color: var(--azul-petroleo);
+            margin-bottom: var(--espaco-xs);
+            font-size: 1.2rem;
+        }
+
+        .consulta-info p {
+            color: var(--cinza-escuro);
+            margin-bottom: var(--espaco-xs);
+        }
+
+        .consulta-status {
+            padding: var(--espaco-xs) var(--espaco-sm);
+            border-radius: var(--borda-radius);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-agendada {
+            background: var(--azul-suave);
+            color: var(--azul-petroleo);
+        }
+
+        .status-realizada {
+            background: var(--sucesso);
+            color: var(--branco);
+        }
+
+        .status-cancelada {
+            background: var(--erro);
+            color: var(--branco);
+        }
+
+        .consulta-actions {
+            display: flex;
+            gap: var(--espaco-sm);
+            margin-top: var(--espaco-md);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--espaco-xl);
+            color: var(--cinza-medio);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: var(--espaco-md);
+            color: var(--cinza-claro);
+        }
+
+        @media (max-width: 768px) {
+            .form-agendamento {
+                grid-template-columns: 1fr;
+                gap: var(--espaco-md);
+            }
+
+            .agendamento-header h1 {
+                font-size: 2rem;
+            }
+
+            .tab-content {
+                padding: var(--espaco-lg);
+            }
+
+            .consulta-header {
+                flex-direction: column;
+                gap: var(--espaco-sm);
+            }
+
+            .consulta-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tabs-header {
+                flex-direction: column;
+            }
+
+            .agendamento-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .time-slots {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="agendamento-page">
+        <div class="agendamento-container">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Voltar para o Início
+            </a>
+
+            <div class="agendamento-header">
+                <h1>Agendar Consultas</h1>
+                <p>Marque suas consultas de forma simples e rápida</p>
+            </div>
+
+            <div id="agendamento-app"></div>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function AgendamentoApp() {
+            const [activeTab, setActiveTab] = useState('agendar');
+            const [formData, setFormData] = useState({
+                nomeMedico: '',
+                crm: '',
+                especialidade: '',
+                data: '',
+                horario: '',
+                observacoes: ''
+            });
+            const [consultas, setConsultas] = useState([]);
+            const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+
+            // Carregar consultas do localStorage
+            useEffect(() => {
+                const consultasSalvas = localStorage.getItem('consultas_masculife');
+                if (consultasSalvas) {
+                    setConsultas(JSON.parse(consultasSalvas));
+                }
+            }, []);
+
+            // Salvar consultas no localStorage
+            useEffect(() => {
+                localStorage.setItem('consultas_masculife', JSON.stringify(consultas));
+            }, [consultas]);
+
+            // Gerar horários disponíveis
+            const gerarHorarios = () => {
+                const horarios = [];
+                for (let hora = 8; hora <= 18; hora++) {
+                    for (let minuto = 0; minuto < 60; minuto += 30) {
+                        const horaFormatada = `${hora.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
+                        horarios.push(horaFormatada);
+                    }
+                }
+                return horarios;
+            };
+
+            // Atualizar horários quando a data mudar
+            useEffect(() => {
+                if (formData.data) {
+                    setHorariosDisponiveis(gerarHorarios());
+                } else {
+                    setHorariosDisponiveis([]);
+                }
+            }, [formData.data]);
+
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: value
+                }));
+            };
+
+            const handleAgendarConsulta = (e) => {
+                e.preventDefault();
+                
+                if (!formData.nomeMedico || !formData.crm || !formData.especialidade || !formData.data || !formData.horario) {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    return;
+                }
+
+                const novaConsulta = {
+                    id: Date.now(),
+                    ...formData,
+                    status: 'agendada',
+                    dataCriacao: new Date().toISOString()
+                };
+
+                setConsultas(prev => [novaConsulta, ...prev]);
+                
+                // Reset form
+                setFormData({
+                    nomeMedico: '',
+                    crm: '',
+                    especialidade: '',
+                    data: '',
+                    horario: '',
+                    observacoes: ''
+                });
+
+                alert('Consulta agendada com sucesso!');
+                setActiveTab('ativas');
+            };
+
+            const handleCancelarConsulta = (id) => {
+                if (confirm('Tem certeza que deseja cancelar esta consulta?')) {
+                    setConsultas(prev => prev.map(consulta => 
+                        consulta.id === id 
+                            ? { ...consulta, status: 'cancelada' }
+                            : consulta
+                    ));
+                }
+            };
+
+            const handleReagendarConsulta = (id) => {
+                const consulta = consultas.find(c => c.id === id);
+                if (consulta) {
+                    setFormData({
+                        nomeMedico: consulta.nomeMedico,
+                        crm: consulta.crm,
+                        especialidade: consulta.especialidade,
+                        data: '',
+                        horario: '',
+                        observacoes: consulta.observacoes
+                    });
+                    setActiveTab('agendar');
+                }
+            };
+
+            const consultasAtivas = consultas.filter(c => c.status === 'agendada');
+            const consultasHistorico = consultas.filter(c => c.status !== 'agendada');
+
+            const especialidades = [
+                'Cardiologia',
+                'Dermatologia',
+                'Endocrinologia',
+                'Gastroenterologia',
+                'Neurologia',
+                'Ortopedia',
+                'Psiquiatria',
+                'Urologia',
+                'Nutrologia',
+                'Medicina Esportiva',
+                'Clínica Geral'
+            ];
+
+            return (
+                <div className="tabs-container">
+                    <div className="tabs-header">
+                        <button 
+                            className={`tab ${activeTab === 'agendar' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('agendar')}
+                        >
+                            <i className="fas fa-calendar-plus"></i> Nova Consulta
+                        </button>
+                        <button 
+                            className={`tab ${activeTab === 'ativas' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('ativas')}
+                        >
+                            <i className="fas fa-clock"></i> Consultas Ativas
+                        </button>
+                        <button 
+                            className={`tab ${activeTab === 'historico' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('historico')}
+                        >
+                            <i className="fas fa-history"></i> Histórico
+                        </button>
+                    </div>
+
+                    <div className="tab-content">
+                        {/* Aba de Agendamento */}
+                        <div className={`tab-pane ${activeTab === 'agendar' ? 'active' : ''}`}>
+                            <form onSubmit={handleAgendarConsulta}>
+                                <div className="form-agendamento">
+                                    <div className="form-group">
+                                        <label htmlFor="nomeMedico">Nome do Médico *</label>
+                                        <input
+                                            type="text"
+                                            id="nomeMedico"
+                                            value={formData.nomeMedico}
+                                            onChange={(e) => handleInputChange('nomeMedico', e.target.value)}
+                                            placeholder="Digite o nome completo do médico"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="crm">CRM *</label>
+                                        <input
+                                            type="text"
+                                            id="crm"
+                                            value={formData.crm}
+                                            onChange={(e) => handleInputChange('crm', e.target.value)}
+                                            placeholder="Número do CRM"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="especialidade">Especialidade *</label>
+                                        <select
+                                            id="especialidade"
+                                            value={formData.especialidade}
+                                            onChange={(e) => handleInputChange('especialidade', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">Selecione uma especialidade</option>
+                                            {especialidades.map(esp => (
+                                                <option key={esp} value={esp}>{esp}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="data">Data da Consulta *</label>
+                                        <input
+                                            type="date"
+                                            id="data"
+                                            value={formData.data}
+                                            onChange={(e) => handleInputChange('data', e.target.value)}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="form-group full-width">
+                                        <label>Horário Disponível *</label>
+                                        <div className="time-slots">
+                                            {horariosDisponiveis.map(horario => (
+                                                <div
+                                                    key={horario}
+                                                    className={`time-slot ${formData.horario === horario ? 'selected' : ''}`}
+                                                    onClick={() => handleInputChange('horario', horario)}
+                                                >
+                                                    {horario}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        {!formData.data && (
+                                            <small style={{color: 'var(--cinza-medio)', marginTop: '0.5rem'}}>
+                                                Selecione uma data para ver os horários disponíveis
+                                            </small>
+                                        )}
+                                    </div>
+
+                                    <div className="form-group full-width">
+                                        <label htmlFor="observacoes">Observações</label>
+                                        <textarea
+                                            id="observacoes"
+                                            value={formData.observacoes}
+                                            onChange={(e) => handleInputChange('observacoes', e.target.value)}
+                                            placeholder="Alguma observação importante sobre a consulta..."
+                                        />
+                                    </div>
+                                </div>
+
+                                <button type="submit" className="btn btn-agendar">
+                                    <i className="fas fa-calendar-check"></i> Agendar Consulta
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Aba de Consultas Ativas */}
+                        <div className={`tab-pane ${activeTab === 'ativas' ? 'active' : ''}`}>
+                            {consultasAtivas.length > 0 ? (
+                                <div className="consultas-lista">
+                                    {consultasAtivas.map(consulta => (
+                                        <div key={consulta.id} className="consulta-card">
+                                            <div className="consulta-header">
+                                                <div className="consulta-info">
+                                                    <h3>Dr. {consulta.nomeMedico}</h3>
+                                                    <p><strong>CRM:</strong> {consulta.crm}</p>
+                                                    <p><strong>Especialidade:</strong> {consulta.especialidade}</p>
+                                                    <p><strong>Data:</strong> {new Date(consulta.data).toLocaleDateString('pt-BR')} às {consulta.horario}</p>
+                                                    {consulta.observacoes && (
+                                                        <p><strong>Observações:</strong> {consulta.observacoes}</p>
+                                                    )}
+                                                </div>
+                                                <div className={`consulta-status status-${consulta.status}`}>
+                                                    {consulta.status === 'agendada' ? 'Agendada' : consulta.status}
+                                                </div>
+                                            </div>
+                                            <div className="consulta-actions">
+                                                <button 
+                                                    className="btn btn-saiba-mais"
+                                                    onClick={() => handleReagendarConsulta(consulta.id)}
+                                                >
+                                                    <i className="fas fa-calendar-alt"></i> Reagendar
+                                                </button>
+                                                <button 
+                                                    className="btn"
+                                                    style={{background: 'var(--erro)'}}
+                                                    onClick={() => handleCancelarConsulta(consulta.id)}
+                                                >
+                                                    <i className="fas fa-times"></i> Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state">
+                                    <i className="fas fa-calendar-times"></i>
+                                    <h3>Nenhuma consulta agendada</h3>
+                                    <p>Agende sua primeira consulta para começar</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Aba de Histórico */}
+                        <div className={`tab-pane ${activeTab === 'historico' ? 'active' : ''}`}>
+                            {consultasHistorico.length > 0 ? (
+                                <div className="consultas-lista">
+                                    {consultasHistorico.map(consulta => (
+                                        <div key={consulta.id} className="consulta-card">
+                                            <div className="consulta-header">
+                                                <div className="consulta-info">
+                                                    <h3>Dr. {consulta.nomeMedico}</h3>
+                                                    <p><strong>CRM:</strong> {consulta.crm}</p>
+                                                    <p><strong>Especialidade:</strong> {consulta.especialidade}</p>
+                                                    <p><strong>Data:</strong> {new Date(consulta.data).toLocaleDateString('pt-BR')} às {consulta.horario}</p>
+                                                    <p><strong>Agendado em:</strong> {new Date(consulta.dataCriacao).toLocaleDateString('pt-BR')}</p>
+                                                    {consulta.observacoes && (
+                                                        <p><strong>Observações:</strong> {consulta.observacoes}</p>
+                                                    )}
+                                                </div>
+                                                <div className={`consulta-status status-${consulta.status}`}>
+                                                    {consulta.status === 'realizada' ? 'Realizada' : 'Cancelada'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="empty-state">
+                                    <i className="fas fa-history"></i>
+                                    <h3>Nenhum histórico disponível</h3>
+                                    <p>Seu histórico de consultas aparecerá aqui</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<AgendamentoApp />, document.getElementById('agendamento-app'));
+    </script>
+
+    <script src="https://kit.fontawesome.com/862034abf1.js" crossorigin="anonymous"></script>
+</body>
+</html>

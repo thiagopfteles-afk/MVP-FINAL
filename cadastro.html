@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <title>Cadastro - Masculife</title>
+</head>
+
+<body>
+    <div class="container-form">
+        <div class="container">
+            
+            <!-- Header com logo -->
+            <div class="form-header">
+                <a href="index.html" class="logo-form">
+                    <img src="img/masculife-preto.png" alt="Masculife" width="180">
+                </a>
+                <div class="header">
+                    <h2>Crie sua conta</h2>
+                    <p>Junte-se à Masculife e cuide da sua saúde</p>
+                </div>
+            </div>
+
+            <form action="entar.html" id="form" class="form">
+                
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="firstName">Nome</label>
+                        <input type="text" id="firstName" placeholder="Seu nome">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-check-circle"></i>
+                        <small>Nome deve ter pelo menos 2 caracteres</small>
+                    </div>
+
+                    <div class="form-control">
+                        <label for="lastName">Sobrenome</label>
+                        <input type="text" id="lastName" placeholder="Seu sobrenome">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-check-circle"></i>
+                        <small>Sobrenome deve ter pelo menos 2 caracteres</small>
+                    </div>
+                </div>
+
+                <div class="form-control">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="seu.email@exemplo.com">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-check-circle"></i>
+                    <small>Email deve ser válido</small>
+                </div>
+
+                <div class="form-control">
+                    <label for="phone">Telefone</label>
+                    <input type="tel" id="phone" placeholder="(11) 99999-9999">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-check-circle"></i>
+                    <small>Telefone deve ser válido</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" placeholder="Crie uma senha forte">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-check-circle"></i>
+                        <small>Senha deve ter pelo menos 6 caracteres</small>
+                    </div>
+
+                    <div class="form-control">
+                        <label for="password-confirmation">Confirmar Senha</label>
+                        <input type="password" id="password-confirmation" placeholder="Repita sua senha">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-check-circle"></i>
+                        <small>Senhas devem ser iguais</small>
+                    </div>
+                </div>
+
+                <div class="form-control checkbox-control">
+                    <input type="checkbox" id="terms" name="terms">
+                    <label for="terms" class="checkbox-label">
+                        Concordo com os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+                    </label>
+                    <small>Você deve aceitar os termos</small>
+                </div>
+
+                <button type="submit" class="btn btn-full">Criar Conta</button>
+
+                <div class="form-divider">
+                    <span>ou</span>
+                </div>
+
+                <button type="button" class="btn btn-google">
+                    <i class="fab fa-google"></i>
+                    Cadastrar com Google
+                </button>
+
+                <span class="link-form">
+                    Já possui uma conta? <a href="entar.html">Faça login aqui</a>
+                </span>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/862034abf1.js" crossorigin="anonymous"></script>
+    <script>
+        // Validação do formulário
+        const form = document.getElementById('form');
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="tel"]');
+        
+        // Padrões de validação
+        const patterns = {
+            firstName: /^[a-zA-ZÀ-ÿ\s]{2,}$/,
+            lastName: /^[a-zA-ZÀ-ÿ\s]{2,}$/,
+            email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            phone: /^\(\d{2}\)\s\d{4,5}-\d{4}$/,
+            password: /^.{6,}$/
+        };
+
+        function validate(field, regex) {
+            if(regex.test(field.value)) {
+                field.parentElement.classList.add('sucesso');
+                field.parentElement.classList.remove('erro');
+            } else {
+                field.parentElement.classList.add('erro');
+                field.parentElement.classList.remove('sucesso');
+            }
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('password-confirmation');
+            const control = confirmPassword.parentElement;
+            
+            if(confirmPassword.value === password.value && confirmPassword.value !== '') {
+                control.classList.add('sucesso');
+                control.classList.remove('erro');
+            } else {
+                control.classList.add('erro');
+                control.classList.remove('sucesso');
+            }
+        }
+
+        function validateTerms() {
+            const terms = document.getElementById('terms');
+            const control = terms.parentElement;
+            
+            if(terms.checked) {
+                control.classList.add('sucesso');
+                control.classList.remove('erro');
+            } else {
+                control.classList.add('erro');
+                control.classList.remove('sucesso');
+            }
+        }
+
+        // Event listeners
+        inputs.forEach(input => {
+            input.addEventListener('keyup', (e) => {
+                if(e.target.id === 'password-confirmation') {
+                    validatePassword();
+                } else if(patterns[e.target.id]) {
+                    validate(e.target, patterns[e.target.id]);
+                }
+            });
+        });
+
+        document.getElementById('terms').addEventListener('change', validateTerms);
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Validar todos os campos
+            inputs.forEach(input => {
+                if(patterns[input.id]) {
+                    validate(input, patterns[input.id]);
+                }
+            });
+            validatePassword();
+            validateTerms();
+            
+            // Verificar se todos os campos são válidos
+            const allValid = document.querySelectorAll('.sucesso').length === 7; // 6 inputs + termos
+            
+            if(allValid) {
+                // Simular cadastro bem-sucedido
+                alert('Cadastro realizado com sucesso! Redirecionando...');
+                setTimeout(() => {
+                    window.location.href = 'entar.html';
+                }, 1000);
+            } else {
+                alert('Por favor, preencha todos os campos corretamente.');
+            }
+        });
+
+        // Máscara de telefone
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    </script>
+</body>
+
+</html>

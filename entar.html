@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap"
+        rel="stylesheet">
+    <title>Entrar - Masculife</title>
+</head>
+
+<body>
+    <div class="container-form">
+        <div class="container">
+            
+            <!-- Header com logo -->
+            <div class="form-header">
+                <a href="index.html" class="logo-form">
+                    <img src="img/masculife-preto.png" alt="Masculife" width="180">
+                </a>
+                <div class="header">
+                    <h2>Bem-vindo de volta</h2>
+                    <p>Entre na sua conta para continuar</p>
+                </div>
+            </div>
+
+            <form action="index.html" id="form" class="form">
+                
+                <div class="form-control">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="seu.email@exemplo.com">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-check-circle"></i>
+                    <small>Email deve ser válido</small>
+                </div>
+
+                <div class="form-control">
+                    <label for="password">Senha</label>
+                    <div class="password-container">
+                        <input type="password" id="password" placeholder="Sua senha">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-check-circle"></i>
+                    <small>Senha deve ter pelo menos 6 caracteres</small>
+                </div>
+
+                <div class="form-options">
+                    <div class="form-control checkbox-control">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember" class="checkbox-label">Lembrar de mim</label>
+                    </div>
+                    <a href="#" class="forgot-password">Esqueci minha senha</a>
+                </div>
+
+                <button type="submit" class="btn btn-full">Entrar</button>
+
+                <div class="form-divider">
+                    <span>ou</span>
+                </div>
+
+                <button type="button" class="btn btn-google">
+                    <i class="fab fa-google"></i>
+                    Entrar com Google
+                </button>
+
+                <span class="link-form">
+                    Ainda não possui uma conta? <a href="cadastro.html">Cadastre-se aqui</a>
+                </span>
+
+            </form>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/862034abf1.js" crossorigin="anonymous"></script>
+    <script>
+        // Validação do formulário
+        const form = document.getElementById('form');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+
+        // Padrões de validação
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordPattern = /^.{6,}$/;
+
+        function validateField(field, pattern) {
+            if(pattern.test(field.value)) {
+                field.parentElement.classList.add('sucesso');
+                field.parentElement.classList.remove('erro');
+                return true;
+            } else {
+                field.parentElement.classList.add('erro');
+                field.parentElement.classList.remove('sucesso');
+                return false;
+            }
+        }
+
+        // Toggle password visibility
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        // Validação em tempo real
+        email.addEventListener('keyup', () => validateField(email, emailPattern));
+        password.addEventListener('keyup', () => validateField(password, passwordPattern));
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const isEmailValid = validateField(email, emailPattern);
+            const isPasswordValid = validateField(password, passwordPattern);
+            
+            if(isEmailValid && isPasswordValid) {
+                // Simular login bem-sucedido
+                alert('Login realizado com sucesso! Redirecionando...');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+            } else {
+                alert('Por favor, preencha todos os campos corretamente.');
+            }
+        });
+
+        // Foco nos campos ao carregar a página
+        window.addEventListener('load', () => {
+            email.focus();
+        });
+    </script>
+</body>
+
+</html>

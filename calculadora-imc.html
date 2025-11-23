@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <title>Calculadora de IMC - Masculife</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .imc-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--branco-off), var(--azul-suave), var(--verde-claro));
+            padding: var(--espaco-xl) 0;
+        }
+
+        .imc-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--espaco-sm);
+        }
+
+        .imc-header {
+            text-align: center;
+            margin-bottom: var(--espaco-xl);
+        }
+
+        .imc-header h1 {
+            color: var(--azul-petroleo);
+            font-size: 2.5rem;
+            margin-bottom: var(--espaco-sm);
+            font-weight: 700;
+        }
+
+        .imc-header p {
+            color: var(--cinza-escuro);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .imc-card {
+            background: var(--branco);
+            border-radius: var(--borda-radius-lg);
+            box-shadow: var(--sombra-forte);
+            padding: var(--espaco-xl);
+            margin-bottom: var(--espaco-xl);
+            border-top: 6px solid var(--azul-verde);
+        }
+
+        .calculator-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--espaco-lg);
+            margin-bottom: var(--espaco-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            color: var(--cinza-escuro);
+            font-weight: 500;
+            margin-bottom: var(--espaco-xs);
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            padding: var(--espaco-sm);
+            border: 2px solid var(--cinza-claro);
+            border-radius: var(--borda-radius);
+            font-size: 1rem;
+            transition: var(--transicao-rapida);
+            background-color: var(--branco-off);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--azul-verde);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+        }
+
+        .unit-selector {
+            display: flex;
+            gap: var(--espaco-md);
+            margin-bottom: var(--espaco-lg);
+        }
+
+        .unit-option {
+            flex: 1;
+            text-align: center;
+            padding: var(--espaco-sm);
+            border: 2px solid var(--cinza-claro);
+            border-radius: var(--borda-radius);
+            background: var(--branco-off);
+            cursor: pointer;
+            transition: var(--transicao-rapida);
+            font-weight: 500;
+        }
+
+        .unit-option.active {
+            border-color: var(--azul-verde);
+            background: var(--azul-verde);
+            color: var(--branco);
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: var(--espaco-md);
+            font-size: 1.1rem;
+            margin-bottom: var(--espaco-lg);
+        }
+
+        .result-section {
+            text-align: center;
+            padding: var(--espaco-lg);
+            background: var(--branco-off);
+            border-radius: var(--borda-radius);
+            border-left: 4px solid var(--azul-verde);
+        }
+
+        .result-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--azul-petroleo);
+            margin-bottom: var(--espaco-sm);
+        }
+
+        .result-classification {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: var(--espaco-sm);
+        }
+
+        .result-description {
+            color: var(--cinza-escuro);
+            line-height: 1.6;
+        }
+
+        /* Cores para as classificações do IMC */
+        .result-abaixo { color: var(--azul-verde); }
+        .result-normal { color: var(--sucesso); }
+        .result-sobrepeso { color: var(--aviso); }
+        .result-obesidade1 { color: #FF6B35; }
+        .result-obesidade2 { color: #E53E3E; }
+        .result-obesidade3 { color: #C53030; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--espaco-lg);
+            margin-top: var(--espaco-xl);
+        }
+
+        .info-card {
+            background: var(--branco);
+            padding: var(--espaco-lg);
+            border-radius: var(--borda-radius);
+            box-shadow: var(--sombra-suave);
+            text-align: center;
+            border-top: 4px solid var(--verde-marrom);
+        }
+
+        .info-card h3 {
+            color: var(--azul-petroleo);
+            margin-bottom: var(--espaco-sm);
+            font-size: 1.2rem;
+        }
+
+        .info-card p {
+            color: var(--cinza-escuro);
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--espaco-xs);
+            color: var(--azul-verde);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: var(--espaco-lg);
+            transition: var(--transicao-rapida);
+        }
+
+        .back-button:hover {
+            color: var(--verde-marrom);
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .calculator-form {
+                grid-template-columns: 1fr;
+                gap: var(--espaco-md);
+            }
+
+            .imc-header h1 {
+                font-size: 2rem;
+            }
+
+            .imc-card {
+                padding: var(--espaco-lg);
+            }
+
+            .result-value {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .unit-selector {
+                flex-direction: column;
+            }
+
+            .imc-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="imc-page">
+        <div class="imc-container">
+            <a href="index.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Voltar para o Início
+            </a>
+
+            <div class="imc-header">
+                <h1>Calculadora de IMC</h1>
+                <p>Calcule seu Índice de Massa Corporal e entenda melhor sua saúde</p>
+            </div>
+
+            <div id="imc-calculator"></div>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function IMCCalculator() {
+            const [height, setHeight] = useState('');
+            const [weight, setWeight] = useState('');
+            const [unitSystem, setUnitSystem] = useState('metric');
+            const [imc, setImc] = useState(null);
+            const [classification, setClassification] = useState('');
+
+            const classifications = {
+                abaixo: { 
+                    range: [0, 18.5], 
+                    label: 'Abaixo do peso', 
+                    description: 'Procure um nutricionista para adequar sua alimentação e ganhar massa muscular de forma saudável.',
+                    color: 'result-abaixo'
+                },
+                normal: { 
+                    range: [18.5, 24.9], 
+                    label: 'Peso normal', 
+                    description: 'Parabéns! Mantenha hábitos saudáveis com alimentação balanceada e prática regular de exercícios.',
+                    color: 'result-normal'
+                },
+                sobrepeso: { 
+                    range: [25, 29.9], 
+                    label: 'Sobrepeso', 
+                    description: 'Atenção! Considere ajustar sua alimentação e aumentar a atividade física para prevenir problemas de saúde.',
+                    color: 'result-sobrepeso'
+                },
+                obesidade1: { 
+                    range: [30, 34.9], 
+                    label: 'Obesidade Grau I', 
+                    description: 'Recomendamos consultar um médico e nutricionista para um plano de emagrecimento saudável.',
+                    color: 'result-obesidade1'
+                },
+                obesidade2: { 
+                    range: [35, 39.9], 
+                    label: 'Obesidade Grau II', 
+                    description: 'É importante buscar acompanhamento médico especializado para sua saúde e bem-estar.',
+                    color: 'result-obesidade2'
+                },
+                obesidade3: { 
+                    range: [40, Infinity], 
+                    label: 'Obesidade Grau III', 
+                    description: 'Procure atendimento médico urgentemente. A obesidade mórbida requer cuidados especiais.',
+                    color: 'result-obesidade3'
+                }
+            };
+
+            const calculateIMC = () => {
+                if (!height || !weight) return;
+
+                let heightInMeters = unitSystem === 'metric' ? height / 100 : height * 0.0254;
+                let weightInKg = unitSystem === 'metric' ? weight : weight * 0.453592;
+
+                const calculatedIMC = weightInKg / (heightInMeters * heightInMeters);
+                setImc(calculatedIMC.toFixed(1));
+
+                // Determinar classificação
+                for (const [key, value] of Object.entries(classifications)) {
+                    if (calculatedIMC >= value.range[0] && calculatedIMC < value.range[1]) {
+                        setClassification(key);
+                        break;
+                    }
+                }
+            };
+
+            const getClassificationInfo = () => {
+                return classifications[classification] || null;
+            };
+
+            const resetCalculator = () => {
+                setHeight('');
+                setWeight('');
+                setImc(null);
+                setClassification('');
+            };
+
+            useEffect(() => {
+                if (height && weight) {
+                    calculateIMC();
+                }
+            }, [height, weight, unitSystem]);
+
+            const classInfo = getClassificationInfo();
+
+            return (
+                <>
+                    <div className="imc-card">
+                        <div className="unit-selector">
+                            <div 
+                                className={`unit-option ${unitSystem === 'metric' ? 'active' : ''}`}
+                                onClick={() => setUnitSystem('metric')}
+                            >
+                                Sistema Métrico (kg/cm)
+                            </div>
+                            <div 
+                                className={`unit-option ${unitSystem === 'imperial' ? 'active' : ''}`}
+                                onClick={() => setUnitSystem('imperial')}
+                            >
+                                Sistema Imperial (lb/in)
+                            </div>
+                        </div>
+
+                        <div className="calculator-form">
+                            <div className="form-group">
+                                <label htmlFor="height">
+                                    {unitSystem === 'metric' ? 'Altura (cm)' : 'Altura (inches)'}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="height"
+                                    value={height}
+                                    onChange={(e) => setHeight(e.target.value)}
+                                    placeholder={unitSystem === 'metric' ? 'Ex: 175' : 'Ex: 70'}
+                                    min="1"
+                                    step="0.1"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="weight">
+                                    {unitSystem === 'metric' ? 'Peso (kg)' : 'Peso (lb)'}
+                                </label>
+                                <input
+                                    type="number"
+                                    id="weight"
+                                    value={weight}
+                                    onChange={(e) => setWeight(e.target.value)}
+                                    placeholder={unitSystem === 'metric' ? 'Ex: 70' : 'Ex: 154'}
+                                    min="1"
+                                    step="0.1"
+                                />
+                            </div>
+                        </div>
+
+                        <button className="btn calculate-btn" onClick={calculateIMC}>
+                            Calcular IMC
+                        </button>
+
+                        {imc && classInfo && (
+                            <div className="result-section">
+                                <div className="result-value">{imc}</div>
+                                <div className={`result-classification ${classInfo.color}`}>
+                                    {classInfo.label}
+                                </div>
+                                <p className="result-description">{classInfo.description}</p>
+                                <button className="btn btn-saiba-mais" onClick={resetCalculator} style={{marginTop: '1rem'}}>
+                                    Calcular Novamente
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="info-grid">
+                        <div className="info-card">
+                            <h3>O que é IMC?</h3>
+                            <p>O Índice de Massa Corporal (IMC) é uma medida internacional usada para calcular se uma pessoa está no peso ideal.</p>
+                        </div>
+
+                        <div className="info-card">
+                            <h3>Importância</h3>
+                            <p>O IMC ajuda a identificar possíveis problemas de saúde relacionados ao peso, como obesidade ou desnutrição.</p>
+                        </div>
+
+                        <div className="info-card">
+                            <h3>Limitações</h3>
+                            <p>O IMC não considera massa muscular, estrutura óssea ou distribuição de gordura. Consulte um profissional.</p>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        ReactDOM.render(<IMCCalculator />, document.getElementById('imc-calculator'));
+    </script>
+
+    <script src="https://kit.fontawesome.com/862034abf1.js" crossorigin="anonymous"></script>
+</body>
+</html>
